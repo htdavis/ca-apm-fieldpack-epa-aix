@@ -25,16 +25,16 @@ It **VERY** is important that nmonLogReader.pm is placed in \<epa_home\>/epaplug
 
 Add a stateful plugin entry for NMON LogReader and a stateless plugin entries for all others to \<epa_home\>/IntroscopeEPAgent.properties.
 
-introscope.epagent.plugins.stateful.names=NMON (can be appended to a previous entry)
-introscope.epagent.stateful.NMON.command=perl \<epa_home\>/epaplugins/aix/nmonLogReader.pl -sleepTime 15 -logfileDir "<InstallDir>/"
+	introscope.epagent.plugins.stateful.names=NMON (can be appended to a previous entry)
+	introscope.epagent.stateful.NMON.command=perl <epa_home>/epaplugins/aix/nmonLogReader.pl -sleepTime 15 -logfileDir "<InstallDir>/"
 
-introscope.epagent.plugins.stateless.names=DISKSTAT,SVMON,PSWAS (can be appended to a previous entry)
-introscope.epagent.stateless.DISKSTAT.command=perl \<epa_home\>/epaplugins/aix/aixDiskStats.pl
-introscope.epagent.stateless.DISKSTAT.delayInSeconds=900
-introscope.epagent.stateless.SVMON.command=perl \<epa_home\>/epaplugins/aix/aixSVMon.pl
-introscope.epagent.stateless.SVMON.delayInSeconds=900
-introscope.epagent.stateless.PSWAS.command=perl \<epa_home\>/epaplugins/aix/psWASforAIX.pl
-introscope.epagent.stateless.PSWAS.delayInSeconds=900
+	introscope.epagent.plugins.stateless.names=DISKSTAT,SVMON,PSWAS (can be appended to a previous entry)
+	introscope.epagent.stateless.DISKSTAT.command=perl <epa_home>/epaplugins/aix/aixDiskStats.pl
+	introscope.epagent.stateless.DISKSTAT.delayInSeconds=900
+	introscope.epagent.stateless.SVMON.command=perl <epa_home>/epaplugins/aix/aixSVMon.pl
+	introscope.epagent.stateless.SVMON.delayInSeconds=900
+	introscope.epagent.stateless.PSWAS.command=perl <epa_home>/epaplugins/aix/psWASforAIX.pl
+	introscope.epagent.stateless.PSWAS.delayInSeconds=900
 
 
 # Usage Instructions
