@@ -75,7 +75,7 @@ my @arrayResults;
 
 # if debug is enabled, use the sample output for displaying results
 if ($debug) {
-	@arrayResults = <<END_OUTPUT;
+	@arrayResults = <<"END_OUTPUT" =~ m/(^.*\n)/mg;
 Unit: page
 -------------------------------------------------------------------------------
      Pid Command          Inuse      Pin     Pgsp  Virtual
@@ -92,14 +92,128 @@ Unit: page
 END_OUTPUT
 } else {
 	# commandline option for svmon
-	# TODO create method to get pid the the command
 	my $svmonCommand = 'svmon -P [pid] -O commandline=on,segment=on,filterprop=notempty';
 	@arrayResults = `svmonCommand`;
 }
 
-# skip the first 6 rows
-@arrayResults = @arrayResults[6..$#arrayResults];
 
-# parse the results and report the relevant metrics
-
-# TODO look for 'working storage'
+my @vals;
+# skip the first three rows, then parse the results and report the relevant metrics
+@arrayResults = @arrayResults[3..$#arrayResults];
+for(my $i =0; $i< @arrayResults.length; $i++){
+    if ($i == 0){
+        # remove EOL char
+        chomp $arrayResults[$i];
+        # remove leading and trailing spaces
+        $arrayResults[$i] =~ s/^\s+//;
+        #$arrayResults[$i] =~ s/\s+$//;
+        # split the string
+        @vals = split (/\s+/, $arrayResults[$i]);
+        # print the results
+        Wily::PrintMetric::printMetric( type        => 'StringEvent',
+                                        resource    => 'SVMon',
+                                        subresource => '',
+                                        name        => 'Pid',
+                                        value       => $vals[0],
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => '',
+                                        name        => 'Inuse',
+                                        value       => int($vals[2]),
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => '',
+                                        name        => 'Pin',
+                                        value       => int($vals[3]),
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => '',
+                                        name        => 'Pgsp',
+                                        value       => int($vals[4]),
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => '',
+                                        name        => 'Virtual',
+                                        value       => int($vals[5]),
+                                       );
+    } elsif ($arrayResults[$i] =~ /^$/){ $i++; next; }
+     else {
+        # remove EOL char
+        chomp $arrayResults[$i];
+        # remove leading spaces
+        $arrayResults[$i] =~ s/^\s+//;
+        # split the string
+        @vals = split(/\s+/, $arrayResults[$i], 4);
+        # reverse and split $vals[3]
+        my $line = reverse $vals[3];
+        #print $line . "\n"; ##for debugging
+        my @revVals = split(/\s+/, $line, 6);
+        # replace and add values to @vals
+        splice(@vals, 3, 6, @revVals);
+        my ($description, $psize, $inuse, $pin, $pgsp, $virtual);
+        # reverse values before printing metrics
+        $description = reverse $vals[8];
+        $psize = reverse $vals[7];
+        $inuse = reverse $vals[6];
+        $pin = reverse $vals[5];
+        $pgsp = reverse $vals[4];
+        $virtual = reverse $vals[3];
+        # check if Type value is a hyphen and replace with "unknown"
+        if ($vals[1] =~ /\-/){ $vals[1] = "unknown"; }
+        # check if Description value is empty and replace with "unknown"
+        if ($description eq '') { $description = "unknown"; }
+        # print the results using Vsid as the subresource
+        Wily::PrintMetric::printMetric( type        => 'StringEvent',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Esid',
+                                        value       => $vals[1],
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'StringEvent',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Type',
+                                        value       => $vals[2],
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'StringEvent',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Description',
+                                        value       => $description,
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'StringEvent',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Psize',
+                                        value       => $psize,
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Inuse',
+                                        value       => $inuse,
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Pin',
+                                        value       => $pin,
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Pgsp',
+                                        value       => $pgsp,
+                                       );
+        Wily::PrintMetric::printMetric( type        => 'IntCounter',
+                                        resource    => 'SVMon',
+                                        subresource => "Vsid|". $vals[0],
+                                        name        => 'Virtual',
+                                        value       => $virtual,
+                                       );
+    }
+}
