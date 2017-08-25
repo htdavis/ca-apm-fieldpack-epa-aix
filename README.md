@@ -2,9 +2,9 @@
 
 This is a series of plugins for monitoring both the OS and application processes (specifically WebSphere Application Server).
 
-aixDiskStats.pl - gathers I/O statistics for mount points.
-aixSVMon.pl - gathers native heap (working storage) statistics.
-nmonLogReader.pl - reads the output from NMON analysis tool from IBM.
+aixDiskStats.pl - gathers I/O statistics for mount points.  
+aixSVMon.pl - gathers native heap (working storage) statistics.  
+nmonLogReader.pl - reads the output from NMON analysis tool from IBM.  
 psWASforAIX.pl - gathers usage statistics from WebSphere processes.
 
 Tested with CA APM 9.7.1 EM, EPAgent 9.7.1, and Perl 5.22.
