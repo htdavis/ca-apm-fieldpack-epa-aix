@@ -14,7 +14,7 @@
 
 =head1 DESCRIPTION
 
- Pulls Java native heap (working storage) statistics
+ Pulls Java native heap (working storage) statistics for a particular process
 
  To see help information:
 
@@ -26,25 +26,31 @@
 
  perl <epa_home>/epaplugins/aix/aixSVMon.pl --debug
 
+=head1 ISSUE TRACKING
+
+ Submit any bugs/enhancements to: https://github.com/htdavis/ca-apm-fieldpack-epa-aix/issues
+
 =head1 AUTHOR
 
- Hiko Davis, Principal Services Consultant, CA Technologies
+ Hiko Davis, Sr Engineering Services Architect, CA Technologies
 
 =head1 COPYRIGHT
 
- Copyright (c) 2015
+ Copyright (c) 2017
 
  This plug-in is provided AS-IS, with no warranties, so please test thoroughly!
 
 =cut
 
+use strict;
+use warnings;
+
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
 use Wily::PrintMetric;
 
 use Getopt::Long;
 
-use strict;
 
 =head2 SUBROUTINES
 
@@ -90,18 +96,19 @@ Unit: page
    17386         - work                              s    100    34   64     146
    1a38b         2 work process private             sm      7     4   24      31
 END_OUTPUT
+
 } else {
-	# commandline option for svmon
-	my $svmonCommand = 'svmon -P [pid] -O commandline=on,segment=on,filterprop=notempty';
+	# commandline option for svmon; use double-quotes to expand $ARGV[0] before execution
+	my $svmonCommand = "svmon -P $ARGV[0] -O commandline=on,segment=on,filterprop=notempty|tail -10";
 	@arrayResults = `svmonCommand`;
 }
 
 
-my @vals;
-# skip the first three rows, then parse the results and report the relevant metrics
-@arrayResults = @arrayResults[3..$#arrayResults];
-for(my $i =0; $i< @arrayResults.length; $i++){
-    if ($i == 0){
+my (@vals, $procName);
+
+for my $i (3..$#arrayResults){
+    ##print "line $i: $arrayResults[$i]\n";
+    if ($i == 3){
         # remove EOL char
         chomp $arrayResults[$i];
         # remove leading and trailing spaces
@@ -109,34 +116,35 @@ for(my $i =0; $i< @arrayResults.length; $i++){
         #$arrayResults[$i] =~ s/\s+$//;
         # split the string
         @vals = split (/\s+/, $arrayResults[$i]);
+        $procName = $vals[1];
         # print the results
         Wily::PrintMetric::printMetric( type        => 'StringEvent',
                                         resource    => 'SVMon',
-                                        subresource => '',
+                                        subresource => $procName,
                                         name        => 'Pid',
                                         value       => $vals[0],
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => '',
+                                        subresource => $procName,
                                         name        => 'Inuse',
                                         value       => int($vals[2]),
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => '',
+                                        subresource => $procName,
                                         name        => 'Pin',
                                         value       => int($vals[3]),
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => '',
+                                        subresource => $procName,
                                         name        => 'Pgsp',
                                         value       => int($vals[4]),
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => '',
+                                        subresource => $procName,
                                         name        => 'Virtual',
                                         value       => int($vals[5]),
                                        );
@@ -156,7 +164,8 @@ for(my $i =0; $i< @arrayResults.length; $i++){
         splice(@vals, 3, 6, @revVals);
         my ($description, $psize, $inuse, $pin, $pgsp, $virtual);
         # reverse values before printing metrics
-        $description = reverse $vals[8];
+        if (!defined($vals[8])){$description = "unknown";}
+        else {$description = reverse $vals[8];}
         $psize = reverse $vals[7];
         $inuse = reverse $vals[6];
         $pin = reverse $vals[5];
@@ -164,54 +173,52 @@ for(my $i =0; $i< @arrayResults.length; $i++){
         $virtual = reverse $vals[3];
         # check if Type value is a hyphen and replace with "unknown"
         if ($vals[1] =~ /\-/){ $vals[1] = "unknown"; }
-        # check if Description value is empty and replace with "unknown"
-        if ($description eq '') { $description = "unknown"; }
         # print the results using Vsid as the subresource
         Wily::PrintMetric::printMetric( type        => 'StringEvent',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Esid',
                                         value       => $vals[1],
                                        );
         Wily::PrintMetric::printMetric( type        => 'StringEvent',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Type',
                                         value       => $vals[2],
                                        );
         Wily::PrintMetric::printMetric( type        => 'StringEvent',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Description',
                                         value       => $description,
                                        );
         Wily::PrintMetric::printMetric( type        => 'StringEvent',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Psize',
                                         value       => $psize,
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Inuse',
                                         value       => $inuse,
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Pin',
                                         value       => $pin,
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Pgsp',
                                         value       => $pgsp,
                                        );
         Wily::PrintMetric::printMetric( type        => 'IntCounter',
                                         resource    => 'SVMon',
-                                        subresource => "Vsid|". $vals[0],
+                                        subresource => "$procName|Vsid|". $vals[0],
                                         name        => 'Virtual',
                                         value       => $virtual,
                                        );
