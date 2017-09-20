@@ -28,7 +28,8 @@
 
 #import our modules
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/../lib/perl",
+         "$FindBin::Bin/../../lib/perl","$FindBin::Bin/../../lib/perl");
 use Wily::Config; # Config file parser
 use Wily::nmonLogReader; # log reading
 

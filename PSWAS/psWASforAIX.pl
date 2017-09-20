@@ -11,7 +11,8 @@
 # Usage: perl psWASforAIX.pl
 #############################################################
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl",
+         "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
 use Wily::PrintMetric;
 
 use strict;

@@ -1,4 +1,4 @@
-# EPAgent Plugins for AIX (1.0)
+# EPAgent Plugins for AIX (1.1)
 
 This is a series of plugins for monitoring both the OS and application processes (specifically WebSphere Application Server).
 
@@ -25,20 +25,22 @@ It **VERY** is important that nmonLogReader.pm is placed in \<epa_home\>/epaplug
 
 Add a stateful plugin entry for NMON LogReader and a stateless plugin entries for all others to \<epa_home\>/IntroscopeEPAgent.properties.
 
-	introscope.epagent.plugins.stateful.names=NMON (can be appended to a previous entry)
-	introscope.epagent.stateful.NMON.command=perl <epa_home>/epaplugins/aix/nmonLogReader.pl -sleepTime 15 -logfileDir "<InstallDir>/"
+    introscope.epagent.plugins.stateful.names=NMON (can be appended to a previous entry)
+    introscope.epagent.stateful.NMON.command=perl <epa_home>/epaplugins/aix/NMON/nmonLogReader.pl -sleepTime 15 -logfileDir "<InstallDir>/"
 
-	introscope.epagent.plugins.stateless.names=DISKSTAT,SVMON,PSWAS (can be appended to a previous entry)
-	introscope.epagent.stateless.DISKSTAT.command=perl <epa_home>/epaplugins/aix/aixDiskStats.pl
-	introscope.epagent.stateless.DISKSTAT.delayInSeconds=900
-	introscope.epagent.stateless.SVMON.command=perl <epa_home>/epaplugins/aix/aixSVMon.pl
-	introscope.epagent.stateless.SVMON.delayInSeconds=900
-	introscope.epagent.stateless.PSWAS.command=perl <epa_home>/epaplugins/aix/psWASforAIX.pl
-	introscope.epagent.stateless.PSWAS.delayInSeconds=900
+    introscope.epagent.plugins.stateless.names=DISKSTAT,SVMON,PSWAS,LPARSTAT (can be appended to a previous entry)
+    introscope.epagent.stateless.DISKSTAT.command=perl <epa_home>/epaplugins/aix/DISKSTAT/aixDiskStats.pl
+    introscope.epagent.stateless.DISKSTAT.delayInSeconds=900
+    introscope.epagent.stateless.SVMON.command=perl <epa_home>/epaplugins/aix/SVMON/aixSVMon.pl
+    introscope.epagent.stateless.SVMON.delayInSeconds=900
+    introscope.epagent.stateless.PSWAS.command=perl <epa_home>/epaplugins/aix/PSWAS/psWASforAIX.pl
+    introscope.epagent.stateless.PSWAS.delayInSeconds=900
+    introscope.epagent.stateless.LPARSTAT.command=perl <epa_home>/epaplugins/aix/LPARSTAT/aixLparStat.pl
+    introscope.epagent.stateless.LPARSTAT.delayInSeconds=15
 
 
 # Usage Instructions
-No special instructions needed for DiskStats, NMON, and SVMON.
+No special instructions needed for DiskStats, NMON, LPARSTAT, and SVMON.
 
 PSWAS requires that you know the tab location of the WAS application name in the 'ps' output. It is recommended that you speak with your WAS administrator about standardizing the location of that property to ensure consistent results. Adjust the value of '$psCommand' at line 19 of the program.
 
@@ -62,3 +64,4 @@ Changes for each version of the field pack.
 Version | Author | Comment
 --------|--------|--------
 1.0 | Hiko Davis | First bundled version of the field packs.
+1.1 | Hiko Davis | Added LPARSTAT to bundle; updated FindBin path.

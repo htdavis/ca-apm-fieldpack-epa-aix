@@ -8,7 +8,7 @@
  IntroscopeEPAgent.properties configuration
 
  introscope.epagent.plugins.stateless.names=DISKSTATS
- introscope.epagent.stateless.DISKSTATS.command=perl <epa_home>/epaplugins/aix/aixDiskStats.pl [/filesystem1 /filesystem2 ...]
+ introscope.epagent.stateless.DISKSTATS.command=perl <epa_home>/epaplugins/aix/DISKSTAT/aixDiskStats.pl [/filesystem1 /filesystem2 ...]
  introscope.epagent.stateless.DISKSTATS.delayInSeconds=900 (less for more frequent updates)
 
 =head1 DESCRIPTION
@@ -52,7 +52,8 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl",
+         "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
 use Wily::PrintMetric;
 
 use Getopt::Long;

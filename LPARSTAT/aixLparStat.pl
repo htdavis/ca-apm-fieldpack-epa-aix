@@ -9,7 +9,7 @@
  IntroscopeEPAgent.properties configuration
 
  introscope.epagent.plugins.stateless.names=LPARSTAT
- introscope.epagent.stateless.LPARSTAT.command=perl <epa_home>/epaplugins/aix/aixLparStat.pl
+ introscope.epagent.stateless.LPARSTAT.command=perl <epa_home>/epaplugins/aix/LPARSTAT/aixLparStat.pl
  introscope.epagent.stateless.LPARSTAT.delayInSeconds=15
 
 =head1 DESCRIPTION
@@ -24,7 +24,7 @@
 
  To test against sample output, use the DEBUG flag:
 
- perl <epa_home>/epaplugins/aix/aixLparStat.pl --debug
+ perl <epa_home>/epaplugins/aix/LPAR/aixLparStat.pl --debug
 
 =head1 AUTHOR
 
@@ -39,7 +39,8 @@
 =cut
 
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", 
+         "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
 use Wily::PrintMetric;
 
 use Getopt::Long;

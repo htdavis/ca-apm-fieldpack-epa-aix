@@ -9,7 +9,7 @@
  IntroscopeEPAgent.properties configuration
 
  introscope.epagent.plugins.stateless.names=SVMON
- introscope.epagent.stateless.SVMON.command=perl <epa_home>/epaplugins/aix/aixSVMon.pl
+ introscope.epagent.stateless.SVMON.command=perl <epa_home>/epaplugins/aix/SVMON/aixSVMon.pl
  introscope.epagent.stateless.SVMON.delayInSeconds=15
 
 =head1 DESCRIPTION
@@ -46,7 +46,8 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
+use lib ("$FindBin::Bin", "$FindBin::Bin/lib/perl", 
+         "$FindBin::Bin/../lib/perl", "$FindBin::Bin/../../lib/perl");
 use Wily::PrintMetric;
 
 use Getopt::Long;
